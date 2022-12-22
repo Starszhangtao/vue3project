@@ -1,30 +1,25 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+  <div>
+    <div style="background:red" v-show="obj.isshow">header</div>
+    <Tabber v-if="$store.state.isTabbershow" ></Tabber>
+  <router-view></router-view>
+  </div>
 </template>
-
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
+<script>
+import { reactive,provide} from 'vue';
+import Tabber from '@/components/Tabber.vue'
+ export default {
+    components:{
+      Tabber
+    },
+    setup(){
+      const obj=reactive({
+         isshow:true
+      })
+      provide("zhangtao",obj)//供应商提供一个服务，前面是key,后面是value
+    return {
+       obj
     }
-  }
-}
-</style>
+    }
+ }
+</script>

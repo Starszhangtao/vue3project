@@ -1,24 +1,53 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
+
 
 const routes = [
+ {
+  name:'film',
+  path:'/film',
+  component:()=>import('@/views/film'),
+  children:[
   {
-    path: '/',
-    name: 'home',
-    component: HomeView
+  path:'/film/nowplaying',
+  component:()=>import('@/views/film/nowplaying')
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+   path:'/film/custmoon',
+   component:()=>import('@/views/film/custmoon')
+  },{
+   path:'/film',
+   redirect:'/film/nowplaying'
   }
+  ]
+},
+{
+  //动态路由id
+  path:'/detail/:id',
+  component:()=>import('@/views/detail')
+},
+{
+ path:'/cinemas',
+ component:()=>import('@/views/cinemas')
+},
+{
+  path:'/center',
+  component:()=>import('@/views/center')
+},
+{
+  path:'',
+  redirect:'/film'
+},
+{
+ path:'/:zhangtao',
+ redirect:{
+ name:'film'
+}
+}
 ]
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  // history: createWebHistory(process.env.BASE_URL),
+  history:createWebHashHistory(process.env.BASE_URL),
   routes
 })
 
