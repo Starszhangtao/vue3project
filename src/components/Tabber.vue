@@ -39,6 +39,7 @@
     width: 100%;
     height: 2.45rem;
     background: white;
+    z-index: 100;
  }
  
  footer>ul {

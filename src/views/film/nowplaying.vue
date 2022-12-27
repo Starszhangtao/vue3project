@@ -1,64 +1,106 @@
 <template>
-  <div>
-    nowplaying
-    <ul>
-      <li v-for="data in datalist" :key="data.filmId" @click="handin(data.filmId)">
-        {{ data.name }}
+  <div >
+    <van-list
+ v-model:loading="loading"
+  :finished="finished"
+  finished-text="没有更多了"
+  @load="onLoad"
+  :immediate-check="false"
+>
+      <van-cell v-for="data in $store.state.datalist" :key="data.filmId" @click="handin(data.filmId)" >
+        <img :src="data.poster" alt="">
         <div>
-          {{ actorfilter(data.actors) }}
+          <div class="title">{{ data.name }}</div>
+          <div class="neirong">
+            <div>观众评分：<span>{{ data.grade }}</span></div>
+            <div class="actors">{{ data.synopsis }}</div>
+            <div>{{ data.nation }}|{{ data.runtime }}分钟 </div>
+          </div>
         </div>
-      </li>
-    </ul>
+      </van-cell>
+    </van-list>
+    <div class="empty"></div>
   </div>
 </template>
 <script>
-import { reactive, toRefs, onMounted } from 'vue'
-import axios from 'axios'
- import { useRouter } from 'vue-router'
+import { onMounted,ref,reactive } from 'vue'
+import { useRouter } from 'vue-router'
+import { mapState, useStore } from 'vuex'
 export default {
   setup() {
-
-    //定义router //router ===this.$router
-    const router =useRouter()
-    const obj = reactive({
-      datalist: []
+    const router = useRouter()
+    const store = useStore()
+    const loading=ref(false)
+    const finished=ref(false)
+    const obj=reactive({
+       total:0
     })
-    const handin=(filmId)=>{
-        console.log(filmId)
-        router.push(`/detail/${filmId}`)
-      }
-    const actorfilter=(e)=>{
-       if(e===undefined)return "暂无主演";
-      return e.map((item)=>item.name).join(" ")
+    const  onLoad=()=>{
+         if(store.state.datalist.length==obj.total){
+            finished.value=true
+            return
+        }
+         console.log("到底了")
+         store.commit('handcurrent')
+       store.dispatch('getdatalist').then(res=>{
+        console.log(res)
+        obj.total=res
+        loading.value=false
+      })
+    }
+    const handin = (filmId) => {
+      router.push(`/detail/${filmId}`)
+    }
+    const actorfilter = (e) => {
+      if (e === undefined) return "暂无主演";
+      return e.map((item) => item.name).join(" ")
     }
     onMounted(() => {
-      axios({
-        url: 'https://m.maizuo.com/gateway?cityId=310100&pageNum=1&pageSize=10&type=1&k=6651581',
-        headers: {
-          'X-Client-Info': '{"a":"3000","ch":"1002","v":"5.2.1","e":"16640333202575094886957057","bc":"310100"}',
-          'X-Host': ' mall.film-ticket.film.list'
-        }
-      }).then(res => {
-        console.log(res.data.data.films)
-        obj.datalist = res.data.data.films
-      })
-
+      if (store.state.datalist.length === 0) {
+        store.dispatch('getdatalist')
+      } else {
+     
+      }
     })
     return {
-      ...toRefs(obj),
+     loading,
+     finished,
       handin,
-      actorfilter
+      actorfilter,
+      onLoad,
+      obj,
     }
   },
-
-  // methods:{
-  //   handin(filmId){
-  //   this.$router.push(`/detail/${filmId}`)
-  // },
-  // actorfilter(e){
-  //   if(e === undefined)return "暂无主演";
-  //   return e.map((item)=>item.name).join(" ");
-  // }
-  // }
 }
 </script>
+<style lang="scss" scoped>
+.van-list {
+    .van-cell {
+        overflow: hidden;
+        padding: .70rem;
+
+        img {
+            width: 3.6rem;
+            float: left;
+
+        }        .title {
+            font-size: .9rem;
+        }
+
+        .neirong {
+            font-size: .8rem;
+            color: gray;
+
+            .actors {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                width: 14rem;
+            }
+        }
+    }
+}
+.empty{
+ height: 2.45rem;
+}
+</style>
